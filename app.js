@@ -69,8 +69,8 @@ function render() {
   const signalState = byId("signal-state");
   signalState.className = latest.targetChanged ? "urgent-row" : "quiet-row";
   signalState.textContent = latest.targetChanged
-    ? "仓位发生变化，请核对并登记成交"
-    : "没有新调仓，安心持有";
+    ? "下一交易日需要调仓，9:30 后核对价格再操作"
+    : "下一交易日无需调仓，继续持有";
 
   byId("suggestion-title").textContent =
     summary.gap > 0 ? "建议补买" : summary.gap < 0 ? "建议卖出" : "仓位已对齐";
