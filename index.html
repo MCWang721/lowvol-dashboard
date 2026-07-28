@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#123128">
+  <title>红利低波 · 每日信号</title>
+  <meta name="description" content="512890 V5.1 奖励仓模拟盘、成交登记与每日信号">
+  <meta property="og:title" content="红利低波 · 每日信号">
+  <meta property="og:description" content="512890 V5.1 奖励仓每日自动更新">
+  <meta property="og:image" content="https://mcwang721.github.io/lowvol-dashboard/og.png">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <main class="app-shell">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">红利低波 ETF · 512890</p>
+        <h1>每日信号</h1>
+      </div>
+      <div class="avatar" title="公开 Dashboard">V5</div>
+    </header>
+
+    <button id="notice" class="toast" hidden></button>
+
+    <div id="today-panel" class="page-stack">
+      <section id="signal-card" class="signal-card hold">
+        <div class="signal-topline">
+          <span><i class="status-dot"></i> <b id="trade-date">加载中</b> 收盘</span>
+          <span class="sync-label">每日自动更新</span>
+        </div>
+        <div class="signal-main">
+          <div>
+            <p class="signal-caption">今日策略指令</p>
+            <strong id="action">—</strong>
+          </div>
+          <div class="target-ring">
+            <span id="target">—</span>
+            <small>目标仓位</small>
+          </div>
+        </div>
+        <p id="signal-reason" class="signal-reason">正在读取最新模拟盘数据…</p>
+        <div id="signal-state" class="quiet-row">请稍候</div>
+      </section>
+
+      <section class="metric-grid">
+        <div class="metric"><span>收盘价</span><strong id="close">—</strong></div>
+        <div class="metric"><span>距历史高点</span><strong id="drawdown" class="negative">—</strong></div>
+        <div class="metric"><span>我的账户权益</span><strong id="equity">—</strong></div>
+        <div class="metric"><span>登记持仓</span><strong id="shares">—</strong></div>
+      </section>
+
+      <section class="suggestion-card">
+        <div>
+          <p class="section-kicker">按本机登记账户估算</p>
+          <h2 id="suggestion-title">等待数据</h2>
+          <p>目标仓位与登记持仓的差额，仅供执行核对。</p>
+        </div>
+        <strong id="suggestion-amount" class="positive">—</strong>
+      </section>
+
+      <section class="history-card">
+        <div class="section-head">
+          <div>
+            <p class="section-kicker">最近记录</p>
+            <h2>历史信号</h2>
+          </div>
+          <button class="text-button" data-tab="record">登记一笔</button>
+        </div>
+        <div id="timeline" class="timeline"></div>
+      </section>
+    </div>
+
+    <section id="record-panel" class="form-card" hidden>
+      <p class="section-kicker">仅保存在当前手机</p>
+      <h2>登记买入 / 卖出</h2>
+      <p class="form-intro">输入实际成交总金额，系统按成交价估算份额。不会连接券商。</p>
+      <form id="trade-form">
+        <fieldset class="side-picker">
+          <label><input type="radio" name="side" value="BUY" checked><span>买入</span></label>
+          <label><input type="radio" name="side" value="SELL"><span>卖出</span></label>
+        </fieldset>
+        <label class="field">
+          <span>成交金额（元）</span>
+          <input name="amount" type="number" min="1" step="0.01" inputmode="decimal" placeholder="例如 50000" required>
+        </label>
+        <label class="field">
+          <span>成交价格</span>
+          <input id="trade-price" name="price" type="number" min="0.001" step="0.001" inputmode="decimal" required>
+        </label>
+        <label class="field">
+          <span>成交日期</span>
+          <input id="executed-at" name="executedAt" type="date" required>
+        </label>
+        <label class="field">
+          <span>备注（可选）</span>
+          <input name="note" maxlength="120" placeholder="例如：按信号补齐到满仓">
+        </label>
+        <button class="primary-button" type="submit">保存成交</button>
+      </form>
+      <div id="trade-list-wrap" class="trade-list" hidden>
+        <h3>最近成交</h3>
+        <div id="trade-list"></div>
+      </div>
+    </section>
+
+    <section id="settings-panel" class="form-card" hidden>
+      <p class="section-kicker">当前设备设置</p>
+      <h2>账户基准</h2>
+      <p class="form-intro">用于估算仓位差额；所有数据只保存在当前浏览器。</p>
+      <form id="capital-form">
+        <label class="field">
+          <span>初始模拟资金（元）</span>
+          <input id="initial-capital" name="initialCapital" type="number" min="1" step="0.01" required>
+        </label>
+        <button class="primary-button" type="submit">保存设置</button>
+      </form>
+    </section>
+
+    <nav class="bottom-nav" aria-label="主导航">
+      <button class="active" data-tab="today"><span>●</span>今日</button>
+      <button data-tab="record"><span>＋</span>登记</button>
+      <button data-tab="settings"><span>●</span>设置</button>
+    </nav>
+  </main>
+  <script src="./app.js" defer></script>
+</body>
+</html>
