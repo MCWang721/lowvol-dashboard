@@ -194,7 +194,7 @@ byId("capital-form").addEventListener("submit", (event) => {
   render();
 });
 
-fetch("./status.json", { cache: "no-store" })
+fetch(`./status.json?v=${Date.now()}`, { cache: "no-store" })
   .then((response) => {
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     return response.json();
