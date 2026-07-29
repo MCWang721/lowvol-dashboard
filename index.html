@@ -59,6 +59,44 @@
         <strong id="suggestion-amount" class="positive">—</strong>
       </section>
 
+      <section class="chart-card">
+        <div class="chart-head">
+          <div>
+            <p class="section-kicker">价格与策略成交</p>
+            <h2>512890 K线</h2>
+          </div>
+          <div class="period-tabs" role="group" aria-label="K线周期">
+            <button class="period-button active" type="button" data-period="day" aria-pressed="true">日</button>
+            <button class="period-button" type="button" data-period="week" aria-pressed="false">周</button>
+            <button class="period-button" type="button" data-period="month" aria-pressed="false">月</button>
+          </div>
+        </div>
+        <div class="chart-legend" aria-hidden="true">
+          <span class="legend-up">上涨</span>
+          <span class="legend-down">下跌</span>
+          <span class="legend-adj">Adj Close</span>
+          <span class="legend-buy">B 买入</span>
+          <span class="legend-sell">S 卖出</span>
+        </div>
+        <div id="quote-detail" class="quote-detail" aria-live="polite">
+          <strong id="quote-date">加载中</strong>
+          <span>Open <b id="quote-open">—</b></span>
+          <span>High <b id="quote-high">—</b></span>
+          <span>Low <b id="quote-low">—</b></span>
+          <span>Close <b id="quote-close">—</b></span>
+          <span>Adj Close <b id="quote-adj-close">—</b></span>
+        </div>
+        <div class="price-chart">
+          <svg id="kline-chart" viewBox="0 0 620 300" role="img" tabindex="0" aria-label="512890日K线，点击或使用左右方向键查看价格"></svg>
+        </div>
+        <p class="chart-hint">点击、触摸或按左右方向键查看价格；B/S为策略实际模拟成交日。</p>
+        <div id="selected-trades" class="selected-trades" hidden></div>
+        <details class="trade-history">
+          <summary>查看全部历史买入 / 卖出</summary>
+          <div id="strategy-trades"></div>
+        </details>
+      </section>
+
       <section class="history-card">
         <div class="section-head">
           <div>

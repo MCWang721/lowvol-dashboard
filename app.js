@@ -4,10 +4,16 @@ const TRADES_KEY = "lowvol-v51-trades";
 const CAPITAL_KEY = "lowvol-v51-capital";
 const state = {
   statuses: [],
+  market: { day: [], week: [], month: [] },
+  tradeHistory: [],
+  period: "day",
+  selectedCandle: -1,
   trades: loadJson(TRADES_KEY, []),
   initialCapital: Number(localStorage.getItem(CAPITAL_KEY)) || 1_000_000,
 };
 
+const SVG_NS = "http://www.w3.org/2000/svg";
+const CHART = { width: 620, height: 300, left: 10, right: 52, top: 16, bottom: 30 };
 const byId = (id) => document.getElementById(id);
 const money = (value) => new Intl.NumberFormat("zh-CN", {
   style: "currency",
@@ -30,6 +36,153 @@ function showNotice(message) {
   const notice = byId("notice");
   notice.textContent = message;
   notice.hidden = false;
+}
+
+function svgNode(name, attributes = {}, text = "") {
+  const node = document.createElementNS(SVG_NS, name);
+  for (const [key, value] of Object.entries(attributes)) node.setAttribute(key, value);
+  if (text) node.textContent = text;
+  return node;
+}
+
+function tradeCard(trade, className) {
+  const row = document.createElement("div");
+  row.className = className;
+  const badge = document.createElement("span");
+  badge.className = `trade-badge ${trade.side === "SELL" ? "sell" : ""}`;
+  badge.textContent = actionLabel(trade.side);
+  const copy = document.createElement("div");
+  const date = document.createElement("strong");
+  date.textContent = trade.date;
+  const detail = document.createElement("small");
+  detail.textContent = `${trade.quantity.toLocaleString()}份 · 目标${Math.round(trade.targetExposure * 100)}% · ${trade.reason}`;
+  copy.append(date, detail);
+  const price = document.createElement("strong");
+  price.textContent = `¥${trade.price.toFixed(3)}`;
+  row.append(badge, copy, price);
+  return row;
+}
+
+function renderStrategyTrades() {
+  const list = byId("strategy-trades");
+  list.replaceChildren(...state.tradeHistory.map((trade) => tradeCard(trade, "strategy-trade")));
+}
+
+function updateQuote(candle) {
+  if (!candle) return;
+  byId("quote-date").textContent = candle.date;
+  byId("quote-open").textContent = candle.open.toFixed(3);
+  byId("quote-high").textContent = candle.high.toFixed(3);
+  byId("quote-low").textContent = candle.low.toFixed(3);
+  byId("quote-close").textContent = candle.close.toFixed(3);
+  byId("quote-adj-close").textContent = candle.adjClose.toFixed(3);
+  const selected = byId("selected-trades");
+  selected.hidden = candle.trades.length === 0;
+  selected.replaceChildren(...candle.trades.map((trade) => tradeCard(trade, "selected-trade")));
+}
+
+function drawChart() {
+  const rows = state.market[state.period] || [];
+  const svg = byId("kline-chart");
+  svg.replaceChildren();
+  if (!rows.length) return;
+  const plotWidth = CHART.width - CHART.left - CHART.right;
+  const plotHeight = CHART.height - CHART.top - CHART.bottom;
+  const prices = rows.flatMap((row) => [row.high, row.low, row.adjClose]);
+  const rawMin = Math.min(...prices);
+  const rawMax = Math.max(...prices);
+  const padding = Math.max((rawMax - rawMin) * 0.08, 0.01);
+  const minPrice = rawMin - padding;
+  const maxPrice = rawMax + padding;
+  const y = (price) => CHART.top + (maxPrice - price) / (maxPrice - minPrice) * plotHeight;
+  const step = plotWidth / rows.length;
+  const candleWidth = Math.max(1.5, Math.min(8, step * 0.58));
+
+  for (let index = 0; index < 5; index += 1) {
+    const chartY = CHART.top + plotHeight * index / 4;
+    const price = maxPrice - (maxPrice - minPrice) * index / 4;
+    svg.append(
+      svgNode("line", { x1: CHART.left, x2: CHART.width - CHART.right, y1: chartY, y2: chartY, class: "grid-line" }),
+      svgNode("text", { x: CHART.width - CHART.right + 6, y: chartY + 3, class: "axis-label" }, price.toFixed(3)),
+    );
+  }
+
+  const labelIndexes = [...new Set([0, Math.floor((rows.length - 1) / 3), Math.floor((rows.length - 1) * 2 / 3), rows.length - 1])];
+  for (const index of labelIndexes) {
+    const chartX = CHART.left + step * (index + 0.5);
+    const label = state.period === "month" ? rows[index].date.slice(0, 7) : rows[index].date.slice(5);
+    svg.append(svgNode("text", {
+      x: chartX,
+      y: CHART.height - 8,
+      class: "axis-label",
+      "text-anchor": index === 0 ? "start" : index === rows.length - 1 ? "end" : "middle",
+    }, label));
+  }
+
+  const adjPoints = [];
+  rows.forEach((row, index) => {
+    const chartX = CHART.left + step * (index + 0.5);
+    const className = row.close > row.open ? "candle-up" : row.close < row.open ? "candle-down" : "candle-flat";
+    const bodyTop = y(Math.max(row.open, row.close));
+    const bodyHeight = Math.max(1.5, Math.abs(y(row.open) - y(row.close)));
+    svg.append(
+      svgNode("line", { x1: chartX, x2: chartX, y1: y(row.high), y2: y(row.low), class: `candle-wick ${className}` }),
+      svgNode("rect", { x: chartX - candleWidth / 2, y: bodyTop, width: candleWidth, height: bodyHeight, rx: 0.7, class: `candle-body ${className}` }),
+    );
+    adjPoints.push(`${chartX},${y(row.adjClose)}`);
+  });
+  svg.append(svgNode("polyline", { points: adjPoints.join(" "), class: "adj-line" }));
+
+  rows.forEach((row, index) => {
+    const chartX = CHART.left + step * (index + 0.5);
+    row.trades.forEach((trade, tradeIndex) => {
+      const isBuy = trade.side === "BUY";
+      const markerY = isBuy
+        ? Math.min(CHART.height - CHART.bottom - 7, y(row.low) + 11 + tradeIndex * 13)
+        : Math.max(CHART.top + 7, y(row.high) - 11 - tradeIndex * 13);
+      const marker = svgNode("g", { class: `trade-marker ${isBuy ? "buy" : "sell"}` });
+      marker.append(
+        svgNode("circle", { cx: chartX, cy: markerY, r: 6 }),
+        svgNode("text", { x: chartX, y: markerY + 0.5 }, isBuy ? "B" : "S"),
+      );
+      svg.append(marker);
+    });
+  });
+
+  const selectedIndex = Math.max(0, Math.min(state.selectedCandle, rows.length - 1));
+  const selectedX = CHART.left + step * (selectedIndex + 0.5);
+  svg.append(svgNode("line", {
+    x1: selectedX,
+    x2: selectedX,
+    y1: CHART.top,
+    y2: CHART.height - CHART.bottom,
+    class: "crosshair",
+  }));
+  updateQuote(rows[selectedIndex]);
+}
+
+function renderChart(resetSelection = true) {
+  const rows = state.market[state.period] || [];
+  if (resetSelection) state.selectedCandle = rows.length - 1;
+  for (const button of document.querySelectorAll("[data-period]")) {
+    const active = button.dataset.period === state.period;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-pressed", String(active));
+  }
+  drawChart();
+}
+
+function selectCandle(event) {
+  const rows = state.market[state.period] || [];
+  if (!rows.length) return;
+  const rect = byId("kline-chart").getBoundingClientRect();
+  const chartX = (event.clientX - rect.left) / rect.width * CHART.width;
+  const plotWidth = CHART.width - CHART.left - CHART.right;
+  state.selectedCandle = Math.max(0, Math.min(
+    rows.length - 1,
+    Math.floor((chartX - CHART.left) / plotWidth * rows.length),
+  ));
+  drawChart();
 }
 
 function account(latest) {
@@ -84,6 +237,8 @@ function render() {
   byId("initial-capital").value = state.initialCapital;
   renderHistory();
   renderTrades();
+  renderChart();
+  renderStrategyTrades();
 }
 
 function renderHistory() {
@@ -142,7 +297,25 @@ function switchTab(tab) {
 document.addEventListener("click", (event) => {
   const tab = event.target.closest("[data-tab]")?.dataset.tab;
   if (tab) switchTab(tab);
+  const period = event.target.closest("[data-period]")?.dataset.period;
+  if (period) {
+    state.period = period;
+    renderChart();
+  }
   if (event.target.id === "notice") event.target.hidden = true;
+});
+
+byId("kline-chart").addEventListener("pointerdown", selectCandle);
+byId("kline-chart").addEventListener("pointermove", (event) => {
+  if (event.pointerType === "mouse") selectCandle(event);
+});
+byId("kline-chart").addEventListener("keydown", (event) => {
+  if (!["ArrowLeft", "ArrowRight"].includes(event.key)) return;
+  event.preventDefault();
+  const rows = state.market[state.period] || [];
+  const direction = event.key === "ArrowLeft" ? -1 : 1;
+  state.selectedCandle = Math.max(0, Math.min(rows.length - 1, state.selectedCandle + direction));
+  drawChart();
 });
 
 byId("trade-form").addEventListener("submit", (event) => {
@@ -201,6 +374,8 @@ fetch(`./status.json?v=${Date.now()}`, { cache: "no-store" })
   })
   .then((payload) => {
     state.statuses = Array.isArray(payload.statuses) ? payload.statuses : [];
+    state.market = payload.market || state.market;
+    state.tradeHistory = Array.isArray(payload.tradeHistory) ? payload.tradeHistory : [];
     render();
   })
   .catch(() => showNotice("每日数据暂时无法读取，请稍后刷新"));
