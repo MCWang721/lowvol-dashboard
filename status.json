@@ -1,10 +1,22 @@
 {
-  "generatedAt": "2026-07-28T09:01:30.581065+00:00",
+  "generatedAt": "2026-07-29T05:48:41.065783+00:00",
   "statuses": [
+    {
+      "tradeDate": "2026-07-28",
+      "close": 1.176,
+      "drawdown": -0.05390185036202566,
+      "targetExposure": 1.0,
+      "previousTarget": 1.0,
+      "targetChanged": false,
+      "signalReason": "维持第二级满仓",
+      "action": "HOLD",
+      "backtestEquity": 3416645.1262815027,
+      "backtestShares": 2905300
+    },
     {
       "tradeDate": "2026-07-27",
       "close": 1.167,
-      "drawdown": -0.06114239742558125,
+      "drawdown": -0.061142397425581474,
       "targetExposure": 1.0,
       "previousTarget": 1.0,
       "targetChanged": false,
@@ -28,7 +40,7 @@
     {
       "tradeDate": "2026-07-23",
       "close": 1.174,
-      "drawdown": -0.05551086082059342,
+      "drawdown": -0.055510860820593644,
       "targetExposure": 1.0,
       "previousTarget": 1.0,
       "targetChanged": false,
@@ -40,7 +52,7 @@
     {
       "tradeDate": "2026-07-22",
       "close": 1.168,
-      "drawdown": -0.06033789219629737,
+      "drawdown": -0.06033789219629759,
       "targetExposure": 1.0,
       "previousTarget": 1.0,
       "targetChanged": false,
@@ -64,7 +76,7 @@
     {
       "tradeDate": "2026-07-20",
       "close": 1.172,
-      "drawdown": -0.05711987127916163,
+      "drawdown": -0.05711987127916174,
       "targetExposure": 1.0,
       "previousTarget": 1.0,
       "targetChanged": false,
@@ -88,7 +100,7 @@
     {
       "tradeDate": "2026-07-16",
       "close": 1.141,
-      "drawdown": -0.08205953338696514,
+      "drawdown": -0.08205953338696526,
       "targetExposure": 1.0,
       "previousTarget": 1.0,
       "targetChanged": false,
@@ -112,7 +124,7 @@
     {
       "tradeDate": "2026-07-14",
       "close": 1.139,
-      "drawdown": -0.08366854384553313,
+      "drawdown": -0.08366854384553324,
       "targetExposure": 1.0,
       "previousTarget": 1.0,
       "targetChanged": false,
@@ -148,7 +160,7 @@
     {
       "tradeDate": "2026-07-09",
       "close": 1.105,
-      "drawdown": -0.11102172164118906,
+      "drawdown": -0.11102172164118917,
       "targetExposure": 1.0,
       "previousTarget": 1.0,
       "targetChanged": false,
@@ -172,7 +184,7 @@
     {
       "tradeDate": "2026-07-07",
       "close": 1.104,
-      "drawdown": -0.11182622687047294,
+      "drawdown": -0.11182622687047306,
       "targetExposure": 1.0,
       "previousTarget": 1.0,
       "targetChanged": false,
@@ -184,7 +196,7 @@
     {
       "tradeDate": "2026-07-06",
       "close": 1.112,
-      "drawdown": -0.10539018503620101,
+      "drawdown": -0.10539018503620112,
       "targetExposure": 1.0,
       "previousTarget": 1.0,
       "targetChanged": false,
@@ -196,7 +208,7 @@
     {
       "tradeDate": "2026-07-03",
       "close": 1.09,
-      "drawdown": -0.12308930008044905,
+      "drawdown": -0.12308930008044894,
       "targetExposure": 1.0,
       "previousTarget": 1.0,
       "targetChanged": false,
@@ -220,7 +232,7 @@
     {
       "tradeDate": "2026-07-01",
       "close": 1.079,
-      "drawdown": -0.13193885760257285,
+      "drawdown": -0.13193885760257296,
       "targetExposure": 1.0,
       "previousTarget": 1.0,
       "targetChanged": false,
@@ -232,7 +244,7 @@
     {
       "tradeDate": "2026-06-30",
       "close": 1.067,
-      "drawdown": -0.14159292035398097,
+      "drawdown": -0.14159292035398108,
       "targetExposure": 1.0,
       "previousTarget": 1.0,
       "targetChanged": false,
@@ -280,7 +292,7 @@
     {
       "tradeDate": "2026-06-24",
       "close": 1.099,
-      "drawdown": -0.11584875301689279,
+      "drawdown": -0.11584875301689301,
       "targetExposure": 0.5,
       "previousTarget": 0.5,
       "targetChanged": false,
@@ -328,7 +340,7 @@
     {
       "tradeDate": "2026-06-17",
       "close": 1.14,
-      "drawdown": -0.08286403861624903,
+      "drawdown": -0.08286403861624914,
       "targetExposure": 0.5,
       "previousTarget": 0.5,
       "targetChanged": false,
@@ -340,25 +352,13 @@
     {
       "tradeDate": "2026-06-16",
       "close": 1.145,
-      "drawdown": -0.07884151246982896,
+      "drawdown": -0.07884151246982918,
       "targetExposure": 0.5,
       "previousTarget": 0.5,
       "targetChanged": false,
       "signalReason": "维持第一级半仓",
       "action": "HOLD",
       "backtestEquity": 3239674.9258170025,
-      "backtestShares": 1410300
-    },
-    {
-      "tradeDate": "2026-06-15",
-      "close": 1.161,
-      "drawdown": -0.06596942880128531,
-      "targetExposure": 0.5,
-      "previousTarget": 0.5,
-      "targetChanged": false,
-      "signalReason": "维持第一级半仓",
-      "action": "HOLD",
-      "backtestEquity": 3262239.725817003,
       "backtestShares": 1410300
     }
   ]
