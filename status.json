@@ -1,6 +1,18 @@
 {
-  "generatedAt": "2026-07-30T09:40:20.436965+00:00",
+  "generatedAt": "2026-07-31T09:44:17.551866+00:00",
   "statuses": [
+    {
+      "tradeDate": "2026-07-31",
+      "close": 1.204,
+      "drawdown": -0.031375703942073785,
+      "targetExposure": 1.0,
+      "previousTarget": 1.0,
+      "targetChanged": false,
+      "signalReason": "维持第二级满仓",
+      "action": "HOLD",
+      "backtestEquity": 3497993.526281502,
+      "backtestShares": 2905300
+    },
     {
       "tradeDate": "2026-07-30",
       "close": 1.207,
@@ -348,32 +360,10 @@
       "action": "HOLD",
       "backtestEquity": 3195955.6258170027,
       "backtestShares": 1410300
-    },
-    {
-      "tradeDate": "2026-06-18",
-      "close": 1.115,
-      "drawdown": -0.10297666934834893,
-      "targetExposure": 0.5,
-      "previousTarget": 0.5,
-      "targetChanged": false,
-      "signalReason": "维持第一级半仓",
-      "action": "HOLD",
-      "backtestEquity": 3197365.9258170025,
-      "backtestShares": 1410300
     }
   ],
   "market": {
     "day": [
-      {
-        "date": "2026-01-29",
-        "open": 1.15,
-        "high": 1.169,
-        "low": 1.149,
-        "close": 1.169,
-        "adjClose": 1.168999999999998,
-        "volume": 755457571,
-        "trades": []
-      },
       {
         "date": "2026-01-30",
         "open": 1.169,
@@ -1574,6 +1564,16 @@
         "adjClose": 1.207,
         "volume": 1345563105,
         "trades": []
+      },
+      {
+        "date": "2026-07-31",
+        "open": 1.19,
+        "high": 1.204,
+        "low": 1.177,
+        "close": 1.204,
+        "adjClose": 1.204,
+        "volume": 925090341,
+        "trades": []
       }
     ],
     "week": [
@@ -2728,13 +2728,13 @@
         "trades": []
       },
       {
-        "date": "2026-07-30",
+        "date": "2026-07-31",
         "open": 1.161,
         "high": 1.207,
         "low": 1.158,
-        "close": 1.207,
-        "adjClose": 1.207,
-        "volume": 3433469593,
+        "close": 1.204,
+        "adjClose": 1.204,
+        "volume": 4358559934,
         "trades": []
       }
     ],
@@ -4064,13 +4064,13 @@
         ]
       },
       {
-        "date": "2026-07-30",
+        "date": "2026-07-31",
         "open": 1.067,
         "high": 1.207,
         "low": 1.062,
-        "close": 1.207,
-        "adjClose": 1.207,
-        "volume": 18467496471,
+        "close": 1.204,
+        "adjClose": 1.204,
+        "volume": 19392586812,
         "trades": []
       }
     ]
