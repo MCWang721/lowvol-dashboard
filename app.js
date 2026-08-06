@@ -214,6 +214,10 @@ function render() {
   byId("signal-reason").textContent = latest.signalReason;
   byId("close").textContent = `¥${latest.close.toFixed(3)}`;
   byId("drawdown").textContent = pct(latest.drawdown);
+  const peakAdjClose = latest.close / (1 + latest.drawdown);
+  byId("peak-adj-close").textContent = `¥${peakAdjClose.toFixed(3)}`;
+  byId("entry-first-price").textContent = `¥${(peakAdjClose * 0.93).toFixed(3)}`;
+  byId("entry-full-price").textContent = `¥${(peakAdjClose * 0.88).toFixed(3)}`;
   byId("equity").textContent = money(summary.equity);
   byId("shares").textContent = `${summary.shares.toLocaleString()} 份`;
 
