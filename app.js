@@ -6,6 +6,7 @@ const state = {
   statuses: [],
   market: { day: [], week: [], month: [] },
   tradeHistory: [],
+  liveQuote: null,
   period: "day",
   selectedCandle: -1,
   trades: loadJson(TRADES_KEY, []),
@@ -22,6 +23,86 @@ const money = (value) => new Intl.NumberFormat("zh-CN", {
 }).format(value);
 const pct = (value) => `${(value * 100).toFixed(2)}%`;
 const actionLabel = (action) => action === "BUY" ? "买入" : action === "SELL" ? "卖出" : "持有";
+
+function eastmoneyQuote(secid) {
+  return new Promise((resolve, reject) => {
+    const callback = `emQuote${Date.now()}${Math.floor(Math.random() * 10000)}`;
+    const script = document.createElement("script");
+    const cleanup = () => {
+      delete window[callback];
+      script.remove();
+    };
+    const timer = setTimeout(() => {
+      cleanup();
+      reject(new Error("quote timeout"));
+    }, 8000);
+    window[callback] = (payload) => {
+      clearTimeout(timer);
+      const data = payload?.data;
+      cleanup();
+      if (!data || !Number.isFinite(Number(data.f43)) || !Number.isFinite(Number(data.f60))) {
+        reject(new Error("invalid quote"));
+        return;
+      }
+      resolve({
+        price: Number(data.f43) / 1000,
+        previousClose: Number(data.f60) / 1000,
+        timestamp: Number(data.f86) * 1000,
+      });
+    };
+    script.onerror = () => {
+      clearTimeout(timer);
+      cleanup();
+      reject(new Error("quote unavailable"));
+    };
+    script.src = `https://push2.eastmoney.com/api/qt/stock/get?secid=${secid}&fields=f43,f60,f86&cb=${callback}`;
+    document.head.append(script);
+  });
+}
+
+function beijingParts(date) {
+  return Object.fromEntries(new Intl.DateTimeFormat("zh-CN", {
+    timeZone: "Asia/Shanghai",
+    year: "numeric", month: "2-digit", day: "2-digit",
+    hour: "2-digit", minute: "2-digit", hourCycle: "h23",
+  }).formatToParts(date).filter((part) => part.type !== "literal").map((part) => [part.type, part.value]));
+}
+
+function quoteLabel(timestamp) {
+  const now = beijingParts(new Date());
+  const quote = beijingParts(new Date(timestamp));
+  const today = `${now.year}-${now.month}-${now.day}`;
+  const quoteDay = `${quote.year}-${quote.month}-${quote.day}`;
+  const minutes = Number(now.hour) * 60 + Number(now.minute);
+  const weekday = new Intl.DateTimeFormat("en-US", { timeZone: "Asia/Shanghai", weekday: "short" }).format(new Date());
+  const tradingDay = !["Sat", "Sun"].includes(weekday) && today === quoteDay;
+  const open = tradingDay && ((minutes >= 570 && minutes < 690) || (minutes >= 780 && minutes < 900));
+  if (open) return "盘中实时价";
+  if (tradingDay && minutes >= 900) return "今日收盘价";
+  return "最近收盘价";
+}
+
+function renderLiveQuote() {
+  const latest = state.statuses[0];
+  if (!latest) return;
+  const days = state.market.day || [];
+  const fallbackPrevious = days.length > 1 ? days[days.length - 2].close : latest.close;
+  const quote = state.liveQuote || { price: latest.close, previousClose: fallbackPrevious, timestamp: Date.parse(`${latest.tradeDate}T15:00:00+08:00`) };
+  const change = quote.previousClose ? quote.price / quote.previousClose - 1 : 0;
+  const quoteTime = new Intl.DateTimeFormat("zh-CN", {
+    timeZone: "Asia/Shanghai", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hourCycle: "h23",
+  }).format(new Date(quote.timestamp));
+  byId("live-price").textContent = `¥${quote.price.toFixed(3)}`;
+  byId("previous-close").textContent = `¥${quote.previousClose.toFixed(3)}`;
+  byId("live-change").textContent = pct(change);
+  byId("live-change").className = change >= 0 ? "positive" : "negative";
+  byId("live-status").textContent = `${quoteLabel(quote.timestamp)} · 行情时间 ${quoteTime}${state.liveQuote ? "" : " · 实时源暂不可用"}`;
+
+  const summary = account(latest, quote.price);
+  byId("equity").textContent = money(summary.equity);
+  byId("suggestion-amount").textContent = money(Math.abs(summary.gap));
+  byId("suggestion-amount").className = summary.gap >= 0 ? "positive" : "negative";
+}
 
 function loadJson(key, fallback) {
   try {
@@ -185,7 +266,7 @@ function selectCandle(event) {
   drawChart();
 }
 
-function account(latest) {
+function account(latest, markPrice = latest.close) {
   const cash = state.trades.reduce(
     (sum, trade) => sum + (trade.side === "BUY" ? -trade.amount : trade.amount),
     state.initialCapital,
@@ -194,7 +275,7 @@ function account(latest) {
     (sum, trade) => sum + (trade.side === "BUY" ? trade.shares : -trade.shares),
     0,
   );
-  const positionValue = shares * latest.close;
+  const positionValue = shares * markPrice;
   const equity = cash + positionValue;
   return {
     shares,
@@ -243,6 +324,7 @@ function render() {
   renderTrades();
   renderChart();
   renderStrategyTrades();
+  renderLiveQuote();
 }
 
 function renderHistory() {
@@ -381,5 +463,11 @@ fetch(`./status.json?v=${Date.now()}`, { cache: "no-store" })
     state.market = payload.market || state.market;
     state.tradeHistory = Array.isArray(payload.tradeHistory) ? payload.tradeHistory : [];
     render();
+    eastmoneyQuote("1.512890")
+      .then((quote) => {
+        state.liveQuote = quote;
+        renderLiveQuote();
+      })
+      .catch(() => renderLiveQuote());
   })
   .catch(() => showNotice("每日数据暂时无法读取，请稍后刷新"));

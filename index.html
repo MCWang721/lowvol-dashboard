@@ -43,8 +43,20 @@
         <div id="signal-state" class="quiet-row">请稍候</div>
       </section>
 
+      <section class="live-card" aria-live="polite">
+        <div>
+          <p class="section-kicker">512890 实时行情</p>
+          <h2 id="live-price">—</h2>
+          <p id="live-status">正在读取行情…</p>
+        </div>
+        <div class="live-stats">
+          <span>上个交易日收盘 <b id="previous-close">—</b></span>
+          <span>今日涨跌 <b id="live-change">—</b></span>
+        </div>
+      </section>
+
       <section class="metric-grid">
-        <div class="metric"><span>收盘价</span><strong id="close">—</strong></div>
+        <div class="metric"><span>信号日收盘价</span><strong id="close">—</strong></div>
         <div class="metric"><span>距历史高点</span><strong id="drawdown" class="negative">—</strong></div>
         <div class="metric"><span>历史高点（Adj Close）</span><strong id="peak-adj-close">—</strong></div>
         <div class="metric"><span>-7% 半仓线（Adj Close）</span><strong id="entry-first-price">—</strong></div>

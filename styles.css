@@ -72,7 +72,13 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .urgent-row { background: #f7dfaa; color: #382d18; font-weight: 800; }
 
 .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.metric, .suggestion-card, .chart-card, .history-card, .form-card { border: 1px solid rgba(214,210,199,.8); background: var(--card); box-shadow: 0 7px 24px rgba(43,48,44,.045); }
+.metric, .live-card, .suggestion-card, .chart-card, .history-card, .form-card { border: 1px solid rgba(214,210,199,.8); background: var(--card); box-shadow: 0 7px 24px rgba(43,48,44,.045); }
+.live-card { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 20px; border-radius: 20px; }
+.live-card h2 { margin: 0; font: 700 38px/1.05 Georgia, serif; }
+.live-card p:last-child { margin: 7px 0 0; color: var(--muted); font-size: 11px; }
+.live-stats { display: grid; gap: 9px; min-width: 145px; }
+.live-stats span { display: flex; justify-content: space-between; gap: 12px; color: var(--muted); font-size: 11px; }
+.live-stats b { color: var(--ink); font-size: 13px; font-variant-numeric: tabular-nums; }
 .metric { min-height: 104px; padding: 17px; border-radius: 17px; }
 .metric span { display: block; margin-bottom: 12px; color: var(--muted); font-size: 12px; }
 .metric strong { font-size: 18px; line-height: 1.2; }
@@ -176,6 +182,12 @@ button, a { -webkit-tap-highlight-color: transparent; }
 @media (min-width: 680px) {
   .app-shell { padding-top: 32px; }
   .signal-card { padding: 25px; }
+}
+
+@media (max-width: 420px) {
+  .live-card { align-items: flex-start; }
+  .live-card h2 { font-size: 32px; }
+  .live-stats { min-width: 130px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
